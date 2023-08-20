@@ -8,6 +8,7 @@ from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
+    """count how many times methods of the Cache class are called"""
     @wraps(method)
     def wrapped_method(self, *args, **kwargs):
         key = method.__qualname__
@@ -16,6 +17,7 @@ def count_calls(method: Callable) -> Callable:
     return wrapped_method
 
 def call_history(method: Callable) -> Callable:
+    """store the history of inputs and outputs for a particular function."""
     @wraps(method)
     def wrapped_method(self, *args, **kwargs):
         input_key = "{}:inputs".format(method.__qualname__)
@@ -62,3 +64,26 @@ class Cache:
         """Retrieve the stored data associated with the given
         key and convert it to an integer."""
         return self.get(key, fn=int)
+
+def replay(fn: Callable):
+    """display the history of calls of a particular function"""
+    r = redis.Redis()
+    func_name = fn.__qualname__
+    c = r.get(func_name)
+    try:
+        c = int(c.decode("utf-8"))
+    except Exception:
+        c = 0
+    print("{} was called {} times:".format(func_name, c))
+    inputs = r.lrange("{}:inputs".format(func_name), 0, -1)
+    outputs = r.lrange("{}:outputs".format(func_name), 0, -1)
+    for inp, outp in zip(inputs, outputs):
+        try:
+            inp = inp.decode("utf-8")
+        except Exception:
+            inp = ""
+        try:
+            outp = outp.decode("utf-8")
+        except Exception:
+            outp = ""
+        print("{}(*{}) -> {}".format(func_name, inp, outp))
