@@ -8,6 +8,7 @@ from functools import wraps
 
 redis_conn = redis.Redis()
 
+
 def count_access(func):
     """track how many times a particular URL
     was accessed in the key"""
@@ -18,6 +19,7 @@ def count_access(func):
         redis_conn.incr(access_count_key)
         return func(url, *args, **kwargs)
     return wrapper
+
 
 def cache_content(func):
     """cache the result with an expiration time of 10 seconds"""
@@ -34,6 +36,7 @@ def cache_content(func):
 
         return content
     return wrapper
+
 
 @count_access
 @cache_content
