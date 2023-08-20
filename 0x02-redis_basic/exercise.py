@@ -11,15 +11,18 @@ def count_calls(method: Callable) -> Callable:
     """count how many times methods of the Cache class are called"""
     @wraps(method)
     def wrapped_method(self, *args, **kwargs):
+        """wrap the decorated function and return the wrapper"""
         key = method.__qualname__
         self._redis.incr(key)
         return method(self, *args, **kwargs)
     return wrapped_method
 
+
 def call_history(method: Callable) -> Callable:
     """store the history of inputs and outputs for a particular function."""
     @wraps(method)
     def wrapped_method(self, *args, **kwargs):
+        """wrap the decorated function and return the wrapper"""
         input_key = "{}:inputs".format(method.__qualname__)
         output_key = "{}:outputs".format(method.__qualname__)
 
@@ -30,6 +33,7 @@ def call_history(method: Callable) -> Callable:
 
         return output
     return wrapped_method
+
 
 class Cache:
     def __init__(self):
@@ -64,6 +68,7 @@ class Cache:
         """Retrieve the stored data associated with the given
         key and convert it to an integer."""
         return self.get(key, fn=int)
+
 
 def replay(fn: Callable):
     """display the history of calls of a particular function"""
