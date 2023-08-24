@@ -13,22 +13,22 @@ def log_stats(logs_collection, option=None):
     Args:
         logs_collection: The MongoDB collection containing the logs.
         option: An HTTP method to filter the logs by. Defaults to None
+
     Returns:
         None
     """
+    query = {}
+
     # total_logs (int): The total number of logs in the collection.
-    total_logs = logs_collection.count_documents({})
+    total_logs = logs_collection.count_documents(query)
     print("{} logs".format(total_logs))
 
-    if option:
-        if option in METHODS:
-            # method_counts (dict): A dictionary containing counts of
-            # each HTTP method used.
-            method_count = logs_collection.count_documents({"method": option})
-            print("method {}: {}".format(option, method_count))
-        return
+    if option and option in METHODS:
+        query["method"] = option
 
     for method in methods:
+        # method_counts (dict): A dictionary containing counts of
+        # each HTTP method used.
         method_count = logs_collection.count_documents({"method": method})
         print("method {}: {}".format(method, method_count))
 
