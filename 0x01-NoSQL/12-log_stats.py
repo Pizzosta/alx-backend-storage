@@ -3,26 +3,25 @@
 
 from pymongo import MongoClient
 
+methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 
 def log_stats(logs_collection, option=None):
     """
     Get statistics about Nginx logs stored in MongoDB.
 
+    Args:
+        logs_collection: The MongoDB collection containing the logs.
+        option: An HTTP method to filter the logs by. Defaults to None
     Returns:
-        total_logs (int): The total number of logs in the collection.
-        method_counts (dict): A dictionary containing counts of each
-        HTTP method used.
-            Keys are HTTP methods and values are their corresponding counts.
-        status_check_count (int): The count of logs with
-        method GET and path /status.
+        None
     """
+    #total_logs (int): The total number of logs in the collection.
     total_logs = logs_collection.count_documents({})
     print("{} logs".format(total_logs))
 
-    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-
     if option:
         if option in METHODS:
+        #method_counts (dict): A dictionary containing counts of each HTTP method used.
             method_count = logs_collection.count_documents({"method": option})
             print("method {}: {}".format(option, method_count))
         return
@@ -31,6 +30,7 @@ def log_stats(logs_collection, option=None):
         method_count = logs_collection.count_documents({"method": method})
         print("method {}: {}".format(method, method_count))
 
+    #status_check_count (int): The count of logs with method GET and path /status.
     status_check_count = logs_collection.count_documents(
             {"method": "GET", "path": "/status"})
     print("{} status check".format(status_check_count))
