@@ -4,7 +4,7 @@
 from pymongo import MongoClient
 
 
-def log_stats(logs_collection):
+def log_stats(logs_collection, option=None):
     """
     Get statistics about Nginx logs stored in MongoDB.
 
@@ -20,12 +20,19 @@ def log_stats(logs_collection):
     print("{} logs".format(total_logs))
 
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
+
+    if option:
+        if option in METHODS:
+            method_count = logs_collection.count_documents({"method": option})
+            print("method {}: {}".format(option, method_count))
+        return
+
     for method in methods:
         method_count = logs_collection.count_documents({"method": method})
         print("method {}: {}".format(method, method_count))
 
-    status_check_count = logs_collection.
-    count_documents({"method": "GET", "path": "/status"})
+    status_check_count = logs_collection.count_documents(
+            {"method": "GET", "path": "/status"})
     print("{} status check".format(status_check_count))
 
 
